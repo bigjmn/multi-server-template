@@ -4,7 +4,7 @@ console.log('hi')
 socket.on('welcome', () => {socket.emit('refresh') })
 
 socket.on('takeusers', (data) => {
-  
+
   var namelist = ''
   data.namelist.forEach((item) => {
     namelist += '<div>'+item+'</div>'
@@ -13,6 +13,7 @@ socket.on('takeusers', (data) => {
 
 })
 socket.on('getstartbutton', () => {
-  $('#startbutton').show()
-  $('#waitmessage').hide()
+  //not the most elegant, but that's fine
+  var buttonstring = "<button onclick='startgame()'>Start the Game!</button>"
+  $('#waitmessage').html(buttonstring)
 })

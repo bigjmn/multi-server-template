@@ -1,10 +1,39 @@
 <body>
+  <script src = "/socket.io/socket.io.js"></script>
+
   <script src='/javascripts/gamescript.js'>
+
 
   </script>
   <h1>you made it</h1>
 
-  <div id="nameholder">
+  <div id="lobby-holder">
+    <div class="panel" id='leftpanel'>
+      <div id="nameholder">
+
+      </div>
+      <div id="start-area">
+
+        <div id="waitmessage">
+          Waiting for the host to start the game...
+        </div>
+
+      </div>
+
+    </div>
+    <div class="panel" id='rightpanel'>
+      <!-- Game stuff here -->
+
+
+
+      <!-- This could also be on the index page  -->
+      <div id="rulesbox">
+        <button type="button" id="rulebutton">Rules</button>
+
+      </div>
+
+    </div>
+
 
   </div>
 

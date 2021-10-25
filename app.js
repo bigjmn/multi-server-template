@@ -6,6 +6,7 @@ var logger = require('morgan');
 var debug = require('debug')('expressappejs:server');
 var http = require('http');
 var shortid = require('shortid')
+var _ = require('lodash')
 
 
 var app = express();
@@ -23,7 +24,7 @@ var lobbylist = []
 var lobbydict = {}
 
 function shownrooms(){
-  var nonhiddens = lobbylist.filter((item) => item.privacy != 'hidden')
+  var nonhiddens = lobbylist.filter((item) => item.privacysetting != 'hidden')
   var justnames = nonhiddens.map((item) => item.name)
   return justnames
 
@@ -56,19 +57,20 @@ app.post('/create', function(req, res, next) {
   var password = req.body.password
 
   var roomid = shortid.generate()
+
   roomlist.push(roomid)
 
 
   //build the new url
-  var namesp = '/game/'+roomid
-  var newlobby = require('./Lobby.js')(roomname, privacysetting, password)
-  lobbydict[namesp] = newlobby
+  var urlpath = '/game/'+roomid
+
+
 
 
   var nsp = io.of('/game/'+roomid)
   nsp.on('connection', (socket) => {
     console.log('connected')
-    socket.lobby = lobbydict[nsp.name]
+    socket.lobby = lobbylist[_.findIndex(lobbylist,{nsp:socket.nsp})]
 
     //if the room is empty when joined, the joiner is the host.
     socket.host = socket.lobby.userlist.length == 0
@@ -76,19 +78,34 @@ app.post('/create', function(req, res, next) {
     socket.username = 'player'+socket.lobby.userlist.length.toString()
     socket.emit('welcome')
     //and now let's store the rest of this logic somwhere else
-    require('./serversocks')(nsp, socket)
+    require('./serversocket')(nsp, socket)
 
 
   })
-  lobbylist.push(nsp)
+  var newlobby = require('./Lobby.js')(roomname, privacysetting, password, urlpath, nsp)
+
+  lobbylist.push(newlobby)
+  console.log(newlobby)
   console.log('and now')
-  res.redirect('/game/'+roomid);
+  res.redirect(newlobby.urlpath);
 });
 
-app.get('/game/:roomid', function(req, res, next){
-  if (roomlist.includes(req.params.roomid)){
-    res.render('gameroom', {title:req.params.roomid})
+app.post('/join/:roomname', function(req, res, next){
+  let name = req.params.roomname
+  let pass = req.body.guesspassword
+  console.log(name)
+  console.log(name)
+  console.log(lobbylist)
+  var lobbywanted = _.find(lobbylist, (x) => {x.name == name && x.password == pass})
+  if (lobbywanted){
+    res.redirect(lobbywanted.urlpath)
   }
+
+})
+
+app.get('/game/:roomid', function(req, res, next){
+  roomlist.includes(req.params.roomid) ? res.render('gameroom', {title:req.params.roomid}) : res.render('error', {message:'Game not found'})
+
 })
 
 

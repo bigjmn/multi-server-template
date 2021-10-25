@@ -20,9 +20,13 @@
       {{#each rooms}}
       <button type="button" class="collapsible">{{this}}</button>
         <div class="content">
-          <form class="" action="/join" method="post">
+          <form class="" action="/join/{{this}}" method="post">
+
             <label for="guesspassword">Password</label>
             <input type="text" name="guesspassword" value="">
+            <div>
+              <button type="submit" name="joinattempt" value={{this}}>Join Room</button>
+            </div>
 
           </form>
         </div>
@@ -47,16 +51,16 @@
     <label for="privacy">Room Privacy:</label>
 
     <select name="privacy" id="privacy">
-      <option value="public" onselect="$('#passzone').hide()">Public</option>
-      <option value="private" onselect="$('#passzone').show()">Private</option>
-      <option value="hidden" onselect="$('#passzone').hide()">Hidden</option>
+      <option value="public" id='pickpub'>Public</option>
+      <option value="private" id='pickpriv'>Private</option>
+      <option value="hidden" id='pickhid'>Hidden</option>
 
     </select>
   </div>
 
 
 
-  <div id='passzone'>
+  <div id='passzone' data-show-if="privacy:private">
       <label>Room Password:</label>
       <input type="text" name="password" />
       <br/>
@@ -68,11 +72,28 @@
 </form>
 <script type="text/javascript">
 var socket = io()
-function showpass(){
-  $('#passzone').show()
+$('#privacy').on('change', function(){
+  $('#passzone').hide()
+  if (this.value == 'private'){
+    $('#passzone').show()
+  }
+})
+
+
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
 }
-
-
 </script>
 
 

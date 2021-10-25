@@ -1,6 +1,14 @@
-module.exports = function Lobby(name, privacysetting, password){
-  this.name = name
-  this.priacysetting = privacysetting
-  this.userlist = []
-  this.password = password
+module.exports = function Lobby(name, privacysetting, password, urlpath, nsp){
+  return{
+    name:name,
+    privacysetting:privacysetting,
+    password:password,
+    urlpath:urlpath,
+    nsp:nsp,
+
+    userlist:[],
+    midgame:false;
+  }
+
+
 }
