@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var io = socketio(server)
 
 app.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express', rooms: shownrooms() });
+  res.render('index', { title: 'Johnny Cool-App', rooms: shownrooms() });
 });
 
 //bit of middleware. I'll probs rewrite it to make it
@@ -64,10 +64,7 @@ app.post('/create', function(req, res, next) {
   //build the new url
   var urlpath = '/game/'+roomid
 
-
-
-
-  var nsp = io.of('/game/'+roomid)
+  var nsp = io.of(urlpath)
   nsp.on('connection', (socket) => {
     console.log('connected')
     socket.lobby = lobbylist[_.findIndex(lobbylist,{nsp:socket.nsp})]
@@ -75,6 +72,8 @@ app.post('/create', function(req, res, next) {
     //if the room is empty when joined, the joiner is the host.
     socket.host = socket.lobby.userlist.length == 0
     socket.lobby.userlist.push(socket) //doesn't make the world explode, don't worry
+
+    //username changes occur after joining
     socket.username = 'player'+socket.lobby.userlist.length.toString()
     socket.emit('welcome')
     //and now let's store the rest of this logic somwhere else
@@ -85,27 +84,27 @@ app.post('/create', function(req, res, next) {
   var newlobby = require('./Lobby.js')(roomname, privacysetting, password, urlpath, nsp)
 
   lobbylist.push(newlobby)
-  console.log(newlobby)
-  console.log('and now')
-  res.redirect(newlobby.urlpath);
+  //take host to their newly created lobby
+  res.redirect(newlobby.urlpath)
 });
 
 app.post('/join/:roomname', function(req, res, next){
   let name = req.params.roomname
   let pass = req.body.guesspassword
-  console.log(name)
-  console.log(name)
-  console.log(lobbylist)
-  var lobbywanted = _.find(lobbylist, (x) => {x.name == name && x.password == pass})
-  if (lobbywanted){
-    res.redirect(lobbywanted.urlpath)
-  }
 
+  var lobbywanted = _.find(lobbylist, (x) => {return (x.name == name && x.password == pass)})
+  lobbywanted ? res.redirect(lobbywanted.urlpath) : res.redirect('/')
 })
 
 app.get('/game/:roomid', function(req, res, next){
   roomlist.includes(req.params.roomid) ? res.render('gameroom', {title:req.params.roomid}) : res.render('error', {message:'Game not found'})
+})
 
+//not super secure, but easy enough to buff up I think.
+var supersecret = 'thiswillchange'
+app.get('/admin/:adminpass', function(req, res, next){
+  var isAdmin = req.params.adminpass == supersecret
+  isAdmin ? res.render('admin', {lobbylist:lobbylist}) : res.redirect('/')
 })
 
 

@@ -1,5 +1,4 @@
 var socket = io(location.href)
-console.log('hi')
 
 socket.on('welcome', () => {socket.emit('refresh') })
 
@@ -17,3 +16,12 @@ socket.on('getstartbutton', () => {
   var buttonstring = "<button onclick='startgame()'>Start the Game!</button>"
   $('#waitmessage').html(buttonstring)
 })
+document.getElementById('changeusername').addEventListener('click', function(){
+  var newname = $('#newusername').val()
+  if (newname){
+    socket.emit('changename', {name:newname})
+  }
+  
+})
+
+socket.on('userleft', () => {socket.emit('refresh')})

@@ -1,0 +1,19 @@
+<body>
+  <script src = "/socket.io/socket.io.js"></script>
+  <script src='/javascripts/admin.js'></script>
+
+  <div class="">
+    {{#each lobbylist}}
+    <div class="info-holder">
+      <h2>{{this.name}}</h2>
+      <h2>{{this.password}}</h2>
+      <h2>{{this.urlpath}}</h2>
+      <div class="">
+        {{this.userlist}}
+      </div>
+
+    </div>
+    {{/each}}
+
+  </div>
+</body>

@@ -5,9 +5,17 @@ module.exports = function Lobby(name, privacysetting, password, urlpath, nsp){
     password:password,
     urlpath:urlpath,
     nsp:nsp,
+    get userlist(){
 
-    userlist:[],
-    midgame:false;
+
+      var sockmap = Array.from(nsp.sockets.values())
+      return sockmap
+    },
+
+
+
+
+    midgame:false,
   }
 
 

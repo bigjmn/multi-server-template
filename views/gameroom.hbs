@@ -1,16 +1,21 @@
 <body>
   <script src = "/socket.io/socket.io.js"></script>
 
-  <script src='/javascripts/gamescript.js'>
 
 
-  </script>
+
+
+
   <h1>you made it</h1>
 
   <div id="lobby-holder">
     <div class="panel" id='leftpanel'>
       <div id="nameholder">
 
+      </div>
+      <div id="usernamepicker">
+        <input type="text" id="newusername" value="">
+        <button type="button" id="changeusername">Change Username</button>
       </div>
       <div id="start-area">
 
@@ -36,5 +41,7 @@
 
 
   </div>
+  <script src='/javascripts/gamescript.js'></script>
+
 
 </body>
