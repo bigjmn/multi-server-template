@@ -1,0 +1,79 @@
+<body>
+  <script src = "/socket.io/socket.io.js"></script>
+  <script src= "/javascripts/waitroom.js">
+
+  </script>
+
+  <h1>{{ title }}</h1>
+  <div id="roomgetter">
+    <button type="button" name="button" id='createbutton' onclick="$('#creatorform').show(); $('#joinerlist').hide()">Create</button>
+    <button type="button" name="button" id='joinbutton' onclick="$('#creatorform').hide(); $('#joinerlist').show()">Join</button>
+
+
+  </div>
+  <div id="joinerlist">
+    <h2>Join a Room</h2>
+
+
+
+    <div id=buttonlist>
+      {{#each rooms}}
+      <button type="button" class="collapsible">{{this}}</button>
+        <div class="content">
+          <form class="" action="/join" method="post">
+            <label for="guesspassword">Password</label>
+            <input type="text" name="guesspassword" value="">
+
+          </form>
+        </div>
+      {{/each}}
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <form action="/create" method="post" id='creatorform'>
+  <div>
+      <label>Room Name:</label>
+      <input type="text" name="roomname" />
+      <br/>
+  </div>
+
+  <div>
+    <label for="privacy">Room Privacy:</label>
+
+    <select name="privacy" id="privacy">
+      <option value="public" onselect="$('#passzone').hide()">Public</option>
+      <option value="private" onselect="$('#passzone').show()">Private</option>
+      <option value="hidden" onselect="$('#passzone').hide()">Hidden</option>
+
+    </select>
+  </div>
+
+
+
+  <div id='passzone'>
+      <label>Room Password:</label>
+      <input type="text" name="password" />
+      <br/>
+  </div>
+
+  <div>
+      <input type="submit" value="Submit" />
+  </div>
+</form>
+<script type="text/javascript">
+var socket = io()
+function showpass(){
+  $('#passzone').show()
+}
+
+
+</script>
+
+
+</body>
