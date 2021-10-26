@@ -71,7 +71,7 @@ app.post('/create', function(req, res, next) {
 
     //if the room is empty when joined, the joiner is the host.
     socket.host = socket.lobby.userlist.length == 0
-    socket.lobby.userlist.push(socket) //doesn't make the world explode, don't worry
+    //socket.lobby.userlist.push(socket) //doesn't make the world explode, don't worry
 
     //username changes occur after joining
     socket.username = 'player'+socket.lobby.userlist.length.toString()
@@ -81,7 +81,7 @@ app.post('/create', function(req, res, next) {
 
 
   })
-  var newlobby = require('./Lobby.js')(roomname, privacysetting, password, urlpath, nsp)
+  var newlobby = require('./Lobby.js')(roomname, privacysetting, password, roomid, urlpath, nsp)
 
   lobbylist.push(newlobby)
   //take host to their newly created lobby
@@ -97,7 +97,7 @@ app.post('/join/:roomname', function(req, res, next){
 })
 
 app.get('/game/:roomid', function(req, res, next){
-  roomlist.includes(req.params.roomid) ? res.render('gameroom', {title:req.params.roomid}) : res.render('error', {message:'Game not found'})
+  _.find(lobbylist, {roomid:req.params.roomid}) ? res.render('gameroom', {title:req.params.roomid}) : res.render('error', {message:'Game not found'})
 })
 
 //not super secure, but easy enough to buff up I think.
@@ -127,3 +127,5 @@ app.use(function(err, req, res, next) {
 server.listen(port, () => {
   console.log(`application is running at: http://localhost:${port}`);
 });
+
+module.exports = lobbylist
