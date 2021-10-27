@@ -39,3 +39,22 @@ a {
   overflow: hidden;
   background-color: #f1f1f1;
 }
+#picholder{
+  background-color: gray;
+}
+canvas{
+  display: none;
+}
+
+#lobbyholder{
+  width: 800px;
+  height: 600px;
+}
+#nameholder{
+  height: 400px;
+}
+.panel{
+  float: left;
+  border-style: solid;
+  border-width: 1px;
+}

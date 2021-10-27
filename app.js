@@ -69,8 +69,8 @@ app.post('/create', function(req, res, next) {
     console.log('connected')
     socket.lobby = lobbylist[_.findIndex(lobbylist,{nsp:socket.nsp})]
 
-    //if the room is empty when joined, the joiner is the host.
-    socket.host = socket.lobby.userlist.length == 0
+    //if user is the first one there, they're the host
+    socket.host = socket.lobby.userlist.length == 1
     //socket.lobby.userlist.push(socket) //doesn't make the world explode, don't worry
 
     //username changes occur after joining
