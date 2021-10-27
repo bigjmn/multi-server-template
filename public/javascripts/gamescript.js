@@ -1,20 +1,29 @@
 var socket = io(location.href)
-
+var midgame = false;
+import {playertags} from './testhelp.js'
 socket.on('welcome', () => {socket.emit('refresh') })
 
 socket.on('takeusers', (data) => {
+  var namelist = playertags(data.namelist)
 
-  var namelist = ''
-  data.namelist.forEach((item) => {
-    namelist += '<div>'+item+'</div>'
-  });
+
   $('#nameholder').html(namelist)
 
 })
+
 socket.on('getstartbutton', () => {
   //not the most elegant, but that's fine
-  var buttonstring = "<button onclick='startgame()'>Start the Game!</button>"
-  $('#waitmessage').html(buttonstring)
+  var hostbutton = document.createElement('button')
+  hostbutton.innerHTML = 'start the game'
+  hostbutton.addEventListener('click', () => {
+    if (midgame){
+      return;
+    }
+    midgame = true;
+    console.log('preptime')
+    socket.emit('gameprep')
+  })
+  $('#waitmessage').html(hostbutton)
 })
 document.getElementById('changeusername').addEventListener('click', function(){
   var newname = $('#newusername').val()
@@ -24,26 +33,28 @@ document.getElementById('changeusername').addEventListener('click', function(){
 
 })
 
+
+
 //TETRIS
 var board;
 var active;
 
 function startgame(){
+  console.log('starting')
+  $('.playercontrols').show()
   gameArea.start()
   board = new Board()
-  socket.emit('gameprep')
+  socket.emit('nextpiece')
 
 
 }
 var gameArea = {
-  canvas : document.createElement('canvas'),
+  canvas : document.getElementById('canvas'),
   start: function(){
-    this.canvas.width = 300;
-    this.canvas.height = 540
-    this.canvas.style = "background:gray"
+
 
     this.ctx = this.canvas.getContext('2d')
-    document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+
 
 
     this.interval = setInterval(updateGame, 20)
@@ -57,7 +68,8 @@ function updateGame(){
   gameArea.clear()
   board.drawSolids()
   if (active){active.redraw()}
-  socket.emit('sharecan', {can:gameArea.canvas.toDataURL()})
+  return
+
 
 
 }
@@ -70,27 +82,7 @@ function createBoard(){
   return solids
 }
 
-function showSolids(board){
-  let blocksize = gameArea.blocksize
-  let ctx = gameArea.ctx
 
-  //for the board rows
-  for (var i=0;i<19;i++){
-    //ignore empty rows
-    if (board[i].length == 0){
-      continue
-    }
-    //
-    let x_cor = i
-    let y_cor = board[i][j][0]
-    let colorfill = board[i][j][1]
-
-    ctx.fillStyle = colorfill
-    ctx.fillRect(x_cor*blocksize, y_cor*blocksize, blocksize, blocksize)
-
-
-  }
-}
 
 function overlap(active, board){
   for (var i=0;i<4;i++){
@@ -109,10 +101,10 @@ function overlap(active, board){
 
 //check if a given pos ray would be out of range
 function outofrange(arr){
-  for (i = 0; i<arr.length;i++){
+  for (var i = 0; i<arr.length;i++){
     let blockcheck = arr[i];
     if (blockcheck[0]<0 || blockcheck[0] >= 10
-        || blockcheck[1] >= 19 ){
+        || blockcheck[1] >= 19 || blockcheck[1] <0){
           return true;
           console.log('imout')
         }
@@ -168,6 +160,7 @@ function piece(arr, color){
       ctx.fillStyle = this.color
 
       ctx.fillRect(this.block_array[i][0]*blocksize,this.block_array[i][1]*blocksize,blocksize,blocksize);
+      ctx.strokeRect(this.block_array[i][0]*blocksize,this.block_array[i][1]*blocksize,blocksize,blocksize)
 
     }
   }
@@ -211,8 +204,9 @@ function piece(arr, color){
   }
 
   this.down = function(){
-  console.log(this.block_array)
+
   if (this.canmove == false){
+
     return;
   }
   let newpos = this.block_array.map(x => [x[0],x[1]+1])
@@ -220,8 +214,9 @@ function piece(arr, color){
     console.log('true')
 
     //if block can't move down, it's ready to be set
-    this.set()
+
     this.canmove = false
+    this.set()
     return false
     }
   this.block_array = newpos;
@@ -230,13 +225,16 @@ function piece(arr, color){
 
   }
 
-  this.autodrop = function(board){
+  this.autodrop = function(){
     while (this.canmove){
-      this.down(board)
+      this.down()
     }
-    return
+
+    return;
+
+
   }
-  this.movedict = function(m,){
+  this.movedict = function(m){
     switch (m) {
       case 'left':
       this.left()
@@ -282,10 +280,10 @@ function rotate_block(block,pivot){
 
 }
 
-function makepiece(){
+function makepiece(x){
 var new_piece;
 let blocksize = 1
-let x = Math.floor(7*Math.random())
+
 
 switch (x) {
 
@@ -337,7 +335,7 @@ switch (x) {
 }
 
 function handleset(){
-  for (i=0;i<19;i++){
+  for (var i=0;i<19;i++){
     if (board.board[i].length == 10){
       board.board.splice(i,1);
       board.board.unshift([]);
@@ -364,45 +362,64 @@ function handleset(){
 //   }
 // })
 
-var dropper = setInterval(dropifable,1000)
-function dropifable(){
-  if (active){
-    active.down()
-  }
-}
+// var dropper = setInterval(dropifable,1000)
+// function dropifable(){
+//   if (active){
+//     active.down()
+//   }
+// }
 
-socket.on('timetostart', () => {
-  startgame()
-})
+
 socket.on('takelisteners', () => {
 
 
+
 document.addEventListener('keydown', function(e){
+  console.log('i hear')
   var sentkey = null;
   switch (e.key) {
-    case ('Spacebar' || " "):
-    socket.emit('auto')
-    return;
+    case 'Enter': sentkey = 'auto';console.log('dropboy'); break;
+
 
     case 'ArrowLeft': sentkey = 'left'; break;
     case 'ArrowRight': sentkey = 'right'; break;
     case 'ArrowUp': sentkey = 'rotate'; break;
   }
+
   if (sentkey){
+    console.log(sentkey)
     socket.emit('trymove', {move:sentkey})
   }
+  return;
 
 })
+startgame()
 })
 socket.on('gotime', () => {
   socket.emit('nextpiece')
 })
 
 
-socket.on('showthis', (data) => {document.getElementById('gamepic').src = data.newcan})
 socket.on('move', (data) => { active.movedict(data.move) })
 
-socket.on('rightstoshow', (data) => {console.log(data.info)})
-socket.on('takepiece', () => {
-  active = makepiece()
+socket.on('rightstoshow', (data) => {
+  $('.control').css('visibility','hidden')
+  var infos = data.info
+  infos.forEach((item) => {
+    if (socket.id != item[0]){
+    ['left', 'rotate', 'right'].forEach((control) => {
+      if (item[1][control]){
+        var idtoshow = item[0]+control
+        $('#'+idtoshow).css('visibility','visible')
+      }
+    });
+  }
+
+  });
+
+  socket.emit('nowthepiece')
 })
+socket.on('takepiece', (data) => {
+  active = makepiece(data.piece)
+})
+socket.on('illegal', () => {active.autodrop()})

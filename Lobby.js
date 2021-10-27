@@ -10,6 +10,7 @@ module.exports = function Lobby(name, privacysetting, password, roomid, urlpath,
 
 
       var sockmap = Array.from(nsp.sockets.values())
+      console.log(sockmap.length)
       return sockmap
     },
 
@@ -17,6 +18,7 @@ module.exports = function Lobby(name, privacysetting, password, roomid, urlpath,
 
 
     midgame:false,
+    readyusers:0
   }
 
 
