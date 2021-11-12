@@ -24,14 +24,12 @@ module.exports = function(io, socket){
   })
 
   socket.on('disconnect', () => {
-    console.log('disconnecting')
 
     socket.lobby.userlist.filter((user) => user.id != socket.id)
     if (socket.lobby.userlist.length == 0){
       if (socket.lobby.dropinterval){
         clearInterval(socket.lobby.dropinterval)
       }
-      console.log('no more')
       lobbylist.splice(lobbylist.indexOf(socket.lobby),1)
       return
     }
@@ -47,12 +45,10 @@ module.exports = function(io, socket){
     socket.lobby.readyusers = 0
     newcontrols(socket.lobby.userlist)
     var controlinfo = socket.lobby.userlist.map(item => [item.id, item.rights])
-    console.log(controlinfo)
     io.emit('rightstoshow', {info:controlinfo})
 
   })
   socket.on('nowthepiece', (data) => {
-    console.log(data.gamespeed)
     socket.lobby.readyusers++
     if (socket.lobby.readyusers < socket.lobby.userlist.length){
       return
@@ -68,13 +64,11 @@ module.exports = function(io, socket){
   })
   function dropfunc(){
     io.emit('dropit')
-    console.log('sendings')
   }
 
 
   //tetris controls
   socket.on('trymove', (data) => {
-    console.log(socket.username+'tried'+data.move)
     if (data.move == 'auto'){
       io.emit('move', {move:data.move})
       return
@@ -88,7 +82,6 @@ module.exports = function(io, socket){
 
 
   socket.on('gameprep', () => {socket.lobby.userlist.forEach((item) => {
-    console.log('prepping')
 
     //decorate sockets
     item.rights = {'left':false,'rotate':false,'right':false}
@@ -96,8 +89,6 @@ module.exports = function(io, socket){
   var firstondeck = Math.floor(7*Math.random())
 
   io.emit('takelisteners', {deck:firstondeck})
-  console.log(socket.lobby.userlist)
-  //socket.emit('gotime')
 })
 socket.on('endgame', () => {
   socket.lobby.midgame = false;

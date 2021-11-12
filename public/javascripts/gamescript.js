@@ -23,7 +23,6 @@ socket.on('getstartbutton', () => {
       return;
     }
     midgame = true;
-    console.log('preptime')
     socket.emit('gameprep')
   })
   $('#waitmessage').html(hostbutton)
@@ -80,7 +79,6 @@ function backtolobby(){
 }
 
 function startgame(){
-  console.log('starting')
   var panelshow = socket.id
   if (gamemode == 'allView'){
     $('.playercontrols').show()
@@ -243,7 +241,6 @@ function outofrange(arr){
     if (blockcheck[0]<0 || blockcheck[0] >= 10
         || blockcheck[1] >= 19 || blockcheck[1] <0){
           return true;
-          console.log('imout')
         }
 
   }
@@ -343,7 +340,6 @@ function piece(arr, color){
   }
 
   this.down = function(){
-    console.log('downing')
 
   if (this.canmove == false){
 
@@ -351,7 +347,6 @@ function piece(arr, color){
   }
   let newpos = this.block_array.map(x => [x[0],x[1]+1])
   if (outofrange(newpos) || overlap(newpos, board.board)){
-    console.log('true')
 
     //if block can't move down, it's ready to be set
 
@@ -446,7 +441,6 @@ switch (x) {
   case 3: //flip z boy
 
   new_piece = new piece([[5,1],[4*1,1],[5*1,0],[6*1,0]], 'yellow')
-  console.log('makingpiece')
   return new_piece;
 
   case 4: //L boy
@@ -477,7 +471,6 @@ switch (x) {
 
 function handleset(){
   $('#setbutton').click()
-  console.log('handling')
   for (var i=0;i<19;i++){
     if (board.board[i].length == 10){
       linesCleared++
@@ -506,7 +499,6 @@ function updateState(){
   level = Math.floor(linesCleared/5)+1
   gamespeed = Math.max(500, 1000-(level-1)*50)
 
-  console.log(gamespeed)
   return;
 }
 
@@ -523,10 +515,9 @@ function hideorshowStartGame(){
 }
 
 function sendmove(e){
-  console.log('i hear')
   var sentkey = null;
   switch (e.key) {
-    case ' ': sentkey = 'auto';console.log('dropboy'); break;
+    case ' ': sentkey = 'auto'; break;
 
 
     case 'ArrowLeft': sentkey = 'left'; break;
@@ -535,7 +526,7 @@ function sendmove(e){
   }
 
   if (sentkey){
-    console.log(sentkey)
+
     socket.emit('trymove', {move:sentkey})
   }
   return;
@@ -544,7 +535,7 @@ function sendmove(e){
 
 $('.tablinks').on('click', function(){
   var gametype = $(this).attr('id')
-  console.log(gametype)
+
   socket.emit('changemode', {newmode:gametype})
 })
 
@@ -561,7 +552,6 @@ setaudio()
 
 socket.on('clientchange', (data) => {
   var new_mode = data.new_mode
-  console.log(new_mode)
   $('.tablinks').css('background-color', "#aaf5f8")
   $('.tablinks').css('border-color', "#27b2d8")
 
@@ -696,21 +686,6 @@ $('#playbutton').on('click', () => {
 
 setsound = new Audio();
 setsound.src='../sounds/settingpiece.mp3';
-// when the sound has been loaded, execute your code
-// setsound.oncanplay = (event) => {
-//
-//     var playedPromise = setsound.play();
-//     if (playedPromise) {
-//         playedPromise.catch((e) => {
-//              console.log(e)
-//              if (e.name === 'NotAllowedError' || e.name === 'NotSupportedError') {
-//                    console.log(e.name);
-//               }
-//          }).then(() => {
-//               console.log("playing setting sound !!!");
-//          });
-//      }
-// }
 
 
 
@@ -724,21 +699,6 @@ $('#setbutton').on('click', () => {
 
 penaltysound = new Audio();
 penaltysound.src='../sounds/baddrop.mp3';
-// when the sound has been loaded, execute your code
-// penaltysound.oncanplay = (event) => {
-//
-//     var playedPromise = penaltysound.play();
-//     if (playedPromise) {
-//         playedPromise.catch((e) => {
-//              console.log(e)
-//              if (e.name === 'NotAllowedError' || e.name === 'NotSupportedError') {
-//                    console.log(e.name);
-//               }
-//          }).then(() => {
-//               console.log("playing setting sound !!!");
-//          });
-//      }
-// }
 
 
 
