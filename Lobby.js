@@ -18,7 +18,9 @@ module.exports = function Lobby(name, privacysetting, password, roomid, urlpath,
 
 
     midgame:false,
-    readyusers:0
+    readyusers:0,
+    dropinterval:null,
+    gamemode:'friendView'
   }
 
 

@@ -1,6 +1,7 @@
 var socket = io(location.href)
 var midgame = false;
-import {playertags} from './testhelp.js'
+
+import {playertags} from './tagmaker.js'
 socket.on('welcome', () => {socket.emit('refresh') })
 
 socket.on('takeusers', (data) => {
@@ -14,7 +15,9 @@ socket.on('takeusers', (data) => {
 socket.on('getstartbutton', () => {
   //not the most elegant, but that's fine
   var hostbutton = document.createElement('button')
-  hostbutton.innerHTML = 'start the game'
+  hostbutton.id = 'hostbutton'
+  hostbutton.className = 'bubbleborder'
+  hostbutton.innerHTML = 'START THE GAME'
   hostbutton.addEventListener('click', () => {
     if (midgame){
       return;
@@ -29,8 +32,15 @@ document.getElementById('changeusername').addEventListener('click', function(){
   var newname = $('#newusername').val()
   if (newname){
     socket.emit('changename', {name:newname})
+    $('#newusername').val('')
+
   }
 
+})
+$('#newusername').on('keydown', (e) => {
+  if (e.key == 'Enter'){
+    $('#changeusername').click()
+  }
 })
 
 
@@ -38,16 +48,136 @@ document.getElementById('changeusername').addEventListener('click', function(){
 //TETRIS
 var board;
 var active;
+var ondeck;
+var linesCleared;
+var level;
+var clicksound;
+var setsound;
+var penaltysound
+var sfx = true;
+
+var penalties;
+var gamemode;
+
+var upcoming;
+
+var gamespeed = 1000;
+
+function endgame(){
+  board = null
+  active = null
+  linesCleared = 0
+  level = 1
+  penalties = 0
+  board = new Board()
+  setTimeout(backtolobby,3000)
+}
+
+function backtolobby(){
+  $('#gameoversign').hide()
+  $('#options-area').show()
+
+}
 
 function startgame(){
   console.log('starting')
-  $('.playercontrols').show()
+  var panelshow = socket.id
+  if (gamemode == 'allView'){
+    $('.playercontrols').show()
+
+  }
+  if (gamemode == 'selfView'){
+    $('.playercontrolmask').show()
+    $('#'+panelshow+'controlmask').hide()
+    $('#'+panelshow).show()
+  }
+  if (gamemode == 'friendView'){
+    $('.playercontrols').show()
+    $('#'+panelshow).hide()
+    $('#'+panelshow+'controlmask').show()
+  }
   gameArea.start()
+  previewArea.init()
+
+
+
   board = new Board()
+
+  level = 1
+  linesCleared = 0
+  penalties = 0
+
+  $('#options-area').hide()
   socket.emit('nextpiece')
+  return;
 
 
 }
+
+var previewArea = {
+  canvas:document.getElementById('previewcan'),
+  init : function(){
+    this.blocksize = 30
+    this.dtx = this.canvas.getContext('2d')
+
+  },
+  update: function(){
+    this.dtx.clearRect(0,0,150,120)
+    var x = upcoming;
+    var prevarray;
+    var prevcolor;
+    switch (x) {
+      case 0:
+      prevarray = [[.5,1.5], [1.5,1.5],[2.5,1.5],[3.5,1.5]]
+      prevcolor = "lightblue";
+
+
+        break;
+      case 1:
+      prevarray = [[1,2],[2,2],[3,2],[2,1]]
+      prevcolor = "orange";
+        break;
+      case 2:
+      prevarray = [[1,1],[2,1],[2,2],[3,2]]
+      prevcolor = "lightgreen";
+        break;
+      case 3:
+      prevarray = [[1,2],[2,2],[2,1],[3,1]]
+      prevcolor = "yellow";
+        break;
+      case 4:
+      prevarray = [[1,1],[2,1],[3,1],[1,2]]
+      prevcolor = "blue";
+        break;
+      case 5:
+      prevarray = [[1,1],[2,1],[3,1],[3,2]]
+      prevcolor = "violet";
+        break;
+      case 6:
+      prevarray = [[1.5, 1], [2.5,1],[1.5,2],[2.5,2]]
+      prevcolor = "red";
+        break;
+      default:
+      return;
+
+
+    }
+    prevarray.forEach((item) => {
+
+      var topleftX = item[0]*30
+      var topleftY = item[1]*30
+
+      this.dtx.fillStyle = prevcolor;
+      this.dtx.fillRect(topleftX, topleftY, this.blocksize, this.blocksize)
+      this.dtx.strokeRect(topleftX, topleftY, this.blocksize, this.blocksize)
+
+    });
+
+
+
+  }
+}
+
 var gameArea = {
   canvas : document.getElementById('canvas'),
   start: function(){
@@ -81,6 +211,13 @@ function createBoard(){
   }
   return solids
 }
+
+
+
+
+
+
+
 
 
 
@@ -127,12 +264,14 @@ function Board(){
       }
       //
       for (var j=0;j<this.board[i].length;j++){
-        let x_cor = i
+        let x_cor = i-1
         let y_cor = this.board[i][j][0]
         let coltofill = this.board[i][j][1]
 
         ctx.fillStyle = coltofill
         ctx.fillRect(y_cor*blocksize,x_cor*blocksize,blocksize,blocksize)
+        ctx.strokeRect(y_cor*blocksize,x_cor*blocksize,blocksize,blocksize)
+
       }
 
 
@@ -159,8 +298,8 @@ function piece(arr, color){
     for (var i=0;i<4;i++){
       ctx.fillStyle = this.color
 
-      ctx.fillRect(this.block_array[i][0]*blocksize,this.block_array[i][1]*blocksize,blocksize,blocksize);
-      ctx.strokeRect(this.block_array[i][0]*blocksize,this.block_array[i][1]*blocksize,blocksize,blocksize)
+      ctx.fillRect(this.block_array[i][0]*blocksize,(this.block_array[i][1]-1)*blocksize,blocksize,blocksize);
+      ctx.strokeRect(this.block_array[i][0]*blocksize,(this.block_array[i][1]-1)*blocksize,blocksize,blocksize)
 
     }
   }
@@ -204,6 +343,7 @@ function piece(arr, color){
   }
 
   this.down = function(){
+    console.log('downing')
 
   if (this.canmove == false){
 
@@ -255,6 +395,7 @@ function piece(arr, color){
       default:
 
     }
+
   }
 
 
@@ -299,7 +440,7 @@ switch (x) {
 
   case 2: //z boy
 
-  new_piece = new piece([[5*blocksize,blocksize],[6*blocksize,blocksize],[5*blocksize,0],[4*blocksize,0]], 'green')
+  new_piece = new piece([[5*blocksize,blocksize],[6*blocksize,blocksize],[5*blocksize,0],[4*blocksize,0]], 'lightgreen')
   return new_piece;
 
   case 3: //flip z boy
@@ -335,50 +476,57 @@ switch (x) {
 }
 
 function handleset(){
+  $('#setbutton').click()
+  console.log('handling')
   for (var i=0;i<19;i++){
     if (board.board[i].length == 10){
+      linesCleared++
       board.board.splice(i,1);
       board.board.unshift([]);
     }
   }
+
+
+  if (board.board[0].length > 0){
+    active = null
+    socket.emit('endgame')
+    return;
+  }
+  updateState()
+  displaystats()
   socket.emit('nextpiece')
 }
 
-// document.addEventListener('keydown', function(e){
-//   if (e.key == 'ArrowDown'){
-//     active.down()
-//   }
-//   if (e.key == 'ArrowLeft'){
-//     active.left()
-//   }
-//   if (e.key == 'ArrowUp'){
-//     active.rotate()
-//   }
-//   if (e.key == 'ArrowRight'){
-//     active.right()
-//   }
-//   if (e.key == 'Spacebar' || e.key == " "){
-//     active.autodrop()
-//   }
-// })
-
-// var dropper = setInterval(dropifable,1000)
-// function dropifable(){
-//   if (active){
-//     active.down()
-//   }
-// }
-
-
-socket.on('takelisteners', () => {
 
 
 
-document.addEventListener('keydown', function(e){
+
+function updateState(){
+
+  level = Math.floor(linesCleared/5)+1
+  gamespeed = Math.max(500, 1000-(level-1)*50)
+
+  console.log(gamespeed)
+  return;
+}
+
+function displaystats(){
+  $('#level').text(level.toString())
+  $('#linescleared').text(linesCleared.toString())
+  $('#penalties').text(penalties.toString())
+}
+function hideorshowStartGame(){
+  $('#options-area').hide()
+  $('#usernamepicker').hide()
+
+  $('.playercontrols').show()
+}
+
+function sendmove(e){
   console.log('i hear')
   var sentkey = null;
   switch (e.key) {
-    case 'Enter': sentkey = 'auto';console.log('dropboy'); break;
+    case ' ': sentkey = 'auto';console.log('dropboy'); break;
 
 
     case 'ArrowLeft': sentkey = 'left'; break;
@@ -392,34 +540,228 @@ document.addEventListener('keydown', function(e){
   }
   return;
 
+}
+
+$('.tablinks').on('click', function(){
+  var gametype = $(this).attr('id')
+  console.log(gametype)
+  socket.emit('changemode', {newmode:gametype})
 })
+
+
+
+
+
+socket.on('takelisteners', (data) => {
+document.addEventListener('keydown', sendmove)
+upcoming = data.deck
 startgame()
+setaudio()
 })
-socket.on('gotime', () => {
-  socket.emit('nextpiece')
+
+socket.on('clientchange', (data) => {
+  var new_mode = data.new_mode
+  console.log(new_mode)
+  $('.tablinks').css('background-color', "#aaf5f8")
+  $('.tablinks').css('border-color', "#27b2d8")
+
+
+  $('#'+new_mode).css('border-color', 'black')
+  $('#'+new_mode).css('background-color', '#27e2d8')
+  var newmode = new_mode+'content'
+  $('.tabcontent').hide()
+  $('#'+newmode).show()
+  gamemode = data.new_mode
+
 })
 
 
-socket.on('move', (data) => { active.movedict(data.move) })
+
+socket.on('move', (data) => {
+  $('#playbutton').click()
+
+  active.movedict(data.move)
+})
 
 socket.on('rightstoshow', (data) => {
   $('.control').css('visibility','hidden')
   var infos = data.info
   infos.forEach((item) => {
-    if (socket.id != item[0]){
     ['left', 'rotate', 'right'].forEach((control) => {
       if (item[1][control]){
         var idtoshow = item[0]+control
-        $('#'+idtoshow).css('visibility','visible')
+        $('#'+idtoshow).css('visibility', 'visible')
+
       }
+
+
     });
-  }
+
 
   });
+  socket.emit('nowthepiece', {gamespeed:gamespeed})
 
-  socket.emit('nowthepiece')
+
 })
 socket.on('takepiece', (data) => {
-  active = makepiece(data.piece)
+  active = makepiece(upcoming)
+  upcoming = data.piece
+  previewArea.update()
 })
-socket.on('illegal', () => {active.autodrop()})
+socket.on('illegal', () => {
+  penalties++
+  active.autodrop()
+  $('#penaltybutton').click()
+})
+
+socket.on('cleanup', () => {
+  midgame = false;
+  $('#gameoversign').show()
+  endgame()
+
+
+
+})
+
+socket.on('dropit', () => {
+  if (active){
+    active.down()
+    return;
+  }
+})
+
+var pageno = 0
+function nextslide(){
+  pageno++
+  $('.slidepage').hide()
+  $('#slide'+pageno.toString()).show()
+  $('.changebut').show()
+  if (pageno == 3){$('#nextbut').hide()}
+
+}
+
+function prevslide(){
+  pageno--
+  $('.slidepage').hide()
+  $('#slide'+pageno.toString()).show()
+  $('.changebut').show()
+  if (pageno == 0){$('#prevbut').hide()}
+
+}
+
+function showslide(){
+  $('#slideshowholder').show()
+}
+
+function exit(){
+  pageno = 0
+  $('.slidepage').hide()
+  $('#slide'+pageno.toString()).show()
+  $('.changebut').show()
+  if (pageno == 0){$('#prevbut').hide()}
+  $('#slideshowholder').hide()
+
+
+}
+$('#rulebutton').on('click', function(){
+  showslide()
+})
+
+$('#nextbut').on('click', function(){
+  nextslide()
+})
+
+$('#prevbut').on('click', function(){
+  prevslide()
+})
+
+$('#backbutton').on('click', function(){
+  exit()
+})
+
+function setaudio(){
+
+
+clicksound = new Audio();
+clicksound.src='../sounds/piecemove.wav';
+
+$('#playbutton').on('click', () => {
+  if (sfx){
+    clicksound.currentTime = 0
+    clicksound.play()
+  }
+
+})
+
+
+setsound = new Audio();
+setsound.src='../sounds/settingpiece.mp3';
+// when the sound has been loaded, execute your code
+// setsound.oncanplay = (event) => {
+//
+//     var playedPromise = setsound.play();
+//     if (playedPromise) {
+//         playedPromise.catch((e) => {
+//              console.log(e)
+//              if (e.name === 'NotAllowedError' || e.name === 'NotSupportedError') {
+//                    console.log(e.name);
+//               }
+//          }).then(() => {
+//               console.log("playing setting sound !!!");
+//          });
+//      }
+// }
+
+
+
+$('#setbutton').on('click', () => {
+  if (sfx){
+    setsound.currentTime = 0
+    setsound.play()
+  }
+
+})
+
+penaltysound = new Audio();
+penaltysound.src='../sounds/baddrop.mp3';
+// when the sound has been loaded, execute your code
+// penaltysound.oncanplay = (event) => {
+//
+//     var playedPromise = penaltysound.play();
+//     if (playedPromise) {
+//         playedPromise.catch((e) => {
+//              console.log(e)
+//              if (e.name === 'NotAllowedError' || e.name === 'NotSupportedError') {
+//                    console.log(e.name);
+//               }
+//          }).then(() => {
+//               console.log("playing setting sound !!!");
+//          });
+//      }
+// }
+
+
+
+$('#penaltybutton').on('click', () => {
+  if (sfx){
+    penaltysound.currentTime = 0
+    penaltysound.play()
+  }
+
+})
+
+}
+function soundtoggle(){
+  if (sfx){
+    $('#sfxbut').html('<i style="font-size:30px" class="fas fa-volume-mute"></i>')
+    sfx = false;
+    return
+  }
+  sfx = true;
+  $('#sfxbut').html("<i style='font-size:30px' class='fas'>&#xf028;</i>")
+  return;
+}
+$('#sfxbut').on('click', function(){
+  soundtoggle()
+  $('#sfxbut').blur()
+})

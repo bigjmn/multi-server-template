@@ -19,7 +19,7 @@ a {
 .playertag{
   border-style: dashed;
   border-width: 1px;
-  margin-top: 20px;
+
 
 }
 .collapsible {
@@ -50,9 +50,10 @@ a {
 }
 
 
-#lobbyholder{
+#lobby-holder{
   width: 800px;
-  height: 600px;
+  height: 540;
+
 }
 #nameholder{
   height: 400px;
@@ -61,21 +62,480 @@ a {
   float: left;
   border-style: solid;
   border-width: 1px;
+  height: 100%;
+  margin-left: 5px;
+
+}
+#rightpanel{
+  float: right;
+}
+.gamestat{
+  width:100%;
 }
 .control{
   float: left;
   width: 33%;
   text-align: center;
   visibility: hidden;
-  font-size: 30px;
+  font-size: 24px;
+}
+.controlmask{
+  float: left;
+  width: 33%;
+  text-align: center;
+
+  font-size: 24px;
 }
 .playercontrols{
   display: none;
 }
+.playercontrolmask{
+  display: none
+}
 .playername{
   text-align: center;
-  font-size: 40px;
+  font-size: 24px;
 }
-canvas{
-  background: gray;
+
+
+.centerlayer{
+  position: absolute;
+}
+#start-area{
+  z-index: 0;
+}
+#options-area{
+
+}
+#gameoversign{
+  display: none;
+  background-color: violet;
+  text-align: center;
+  top: 200px;
+  font-size: 34px;
+
+
+}
+
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  width: 100%;
+
+}
+#leftpanel{
+  background-color: #dcfbfc
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+#game-modes{
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+
+}
+#roomgetter{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+}
+main{
+  width: 500px;
+  justify-content: flex-end;
+  border-style: solid;
+  border-width: 1px;
+  display: flex;
+  flex-direction: column;
+
+
+}
+#rightpanel{
+  width:220px;
+
+}
+.roombutton{
+
+  width: 200px;
+  font-size: 24;
+  margin: 10px;
+}
+#headwrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#buttonwrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.optionwrapper{
+  width: 200px;
+  margin-top: 5px;
+  align-items: center;
+}
+#hostbutton{
+  width: 100%;
+  height: 100%;
+  background-color: #aaf5f8;
+}
+#waitmessage{
+  bottom: 350px;
+  width: 90%;
+  height: 40px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#rulesbox{
+  bottom: 250px;
+  width: 90%;
+  height: 40px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+body{
+  font-family: "Poppins"
+}
+.bubbleborder{
+  border-style: double;
+  border-width: 5px;
+  border-color: #27b2d8;
+
+}
+#lobby-holder{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 600px;
+  width: 800px;
+  justify-content: space-around;
+  align-items: center;
+
+
+}
+.sidepanel{
+  width: 150px;
+  height: 540px;
+  align-items: center;
+  background-color: #dcfbfc;
+
+}
+#centerpanel{
+  width: auto;
+
+  display: flex;
+  flex-direction: column;
+  height: 540px;
+  align-items: center;
+
+  width: 300px;
+  /* background-color: #dcfbfc; */
+  overflow: hidden;
+
+
+
+}
+
+.centerbutton{
+  width: 250px;
+  height: 50px;
+
+}
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+
+
+
+}
+.lingrad{
+  background: repeating-linear-gradient(
+  45deg,
+  #27b6d8,
+  #27b6d8 5px,
+  #27c2d8 5px,
+  #27c2d8 10px
+);
+}
+
+/* Style the buttons inside the tab */
+.tab button,  {
+  background-color: #aaf5f8;
+  float: left;
+
+  border-width: 5px;
+  border-color: #27b6d8;
+
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  width: 100%;
+  margin-left: auto;
+  margin-left: auto;
+  margin-bottom: 5px;
+
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #27e2d8;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #27e2d8;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  height: 80px;
+  background-color: #aaf5f8;
+
+
+
+
+}
+
+#game-modes{
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  height: 300px;
+
+
+
+}
+#gameoversign{
+  /* display: none; */
+  z-index: 3;
+  width: 300px;
+  height: 300px;
+  position: absolute;
+}
+#rulebutton{
+
+  height: 100%;
+  width: 100%;
+
+  z-index: 5;
+  background-color: #aaf5f8;
+}
+#game-modes h2{
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+
+
+}
+#frameholder{
+  z-index: 4;
+  overflow: visible;
+  position: absolute;
+
+
+}
+#tetristitle{
+  font-family: "Abril Fatface";
+  text-align: center;
+}
+
+.playertag{
+  background-color: #aaf5f8;
+  height:70px;
+}
+#start-area{
+
+
+
+  position: absolute;
+
+
+
+}
+#options-area{
+  z-index: 2;
+  overflow: hidden;
+
+
+}
+#nameholder{
+  height: 430px;
+  background-color: #dcfbfc;
+  width: 100%;
+}
+#usernamepicker, #listheader{
+  background-color: #dcfbfc;
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+#listheader{
+  text-align:center;
+  text-decoration: underline;
+  text-transform: capitalize;
+  height: 30px;
+  font-size: 24px;
+  font-weight: bold;
+
+}
+#newusername, #changeusername{
+  width: 90%;
+  margin-left: 5px;
+  margin-right: auto
+
+}
+#changeusername{
+
+}
+#gameoversign{
+
+}
+#slideframe{
+  overflow: visible;
+}
+#backbutton{
+  position: absolute;
+}
+
+
+#mainshow{
+  width: 500px;
+  height:100%;
+
+  overflow: hidden;
+  float: left;
+
+
+
+}
+
+.slidepage p{
+  padding-left: 10px;
+}
+
+.slidepage{
+  float: left;
+  width: 100%;
+  height: 100%;
+  background-color: lightblue;
+  display: none;
+
+
+
+
+
+}
+#slide0{
+  display: block;
+}
+
+.changebut{
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  background-color: white;
+  margin-top: 230px;
+
+  margin-left: 20px;
+  border-width: 1px;
+  font-size: 30px;
+
+
+}
+#prevbut{
+  display: none;
+}
+#canvas{
+  background-color: #dcfbfc;
+
+}
+#slideshowholder{
+  height: 500px;
+  width: 720px;
+  position: absolute;
+  z-index: 5;
+  display: none;
+
+
+
+  border-style: solid;
+  border-width: 1px;
+  background-color: lightblue;
+}
+.buttonholder{
+
+  width: 80px;
+  height: 100%;
+  float: left;
+  border-style: dashed;
+  border-width: 1px;
+  align-items: center;
+  justify-content: center;
+
+
+}
+.slidepage h1{
+  text-align: center;
+}
+#previewcan{
+  border-style: solid;
+  border-width: 1px;
+
+}
+.squeezestat{
+  height: 15px;
+
+}
+.stat{
+  font-size: 30px;
+}
+
+.soundbutton{
+  display: none;
+}
+.statblock{
+  margin-bottom: 10px;
+}
+#sfxbut{
+  border: none;
+  background-color: inherit;
+  margin-top: 5px;
 }

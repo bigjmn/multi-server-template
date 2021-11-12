@@ -8,6 +8,20 @@ var http = require('http');
 var shortid = require('shortid')
 var _ = require('lodash')
 
+var crypto = require('crypto');
+
+//for encoding admin password. there's def a better way...
+function hashpass(secret){
+  var hash = crypto.createHmac('sha256', secret)
+                 .update('onealmond')
+                 .digest('hex');
+
+  return hash
+
+}
+console.log(hashpass('jnicks'))
+
+'160c6be7d60242b70b1988d173d963bc8aaccba69e4a76e877e640bab86007fa'
 
 var app = express();
 
@@ -43,7 +57,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var io = socketio(server)
 
 app.get('/', function(req, res, next) {
-  res.render('index', { title: 'Johnny Cool-App', rooms: shownrooms() });
+  res.render('index', { title: 'Tetris Buddies', rooms: shownrooms() });
 });
 
 //bit of middleware. I'll probs rewrite it to make it
@@ -87,23 +101,27 @@ app.post('/create', function(req, res, next) {
   //take host to their newly created lobby
   res.redirect(newlobby.urlpath)
 });
-
+//NOT CURRENTLY USED, MIGHT MIGHT RE-IMPLEMENT
 app.post('/join/:roomname', function(req, res, next){
   let name = req.params.roomname
   let pass = req.body.guesspassword
 
-  var lobbywanted = _.find(lobbylist, (x) => {return (x.name == name && x.password == pass)})
+  var lobbywanted = _.find(lobbylist, (x) => {return (x.name == name && x.password == pass && x.midgame == false)})
   lobbywanted ? res.redirect(lobbywanted.urlpath) : res.redirect('/')
 })
 
+
+
 app.get('/game/:roomid', function(req, res, next){
-  _.find(lobbylist, {roomid:req.params.roomid}) ? res.render('gameroom', {title:req.params.roomid}) : res.render('error', {message:'Game not found'})
+  var foundlobby = _.find(lobbylist, {roomid:req.params.roomid})
+  foundlobby ? res.render('gameroom', {title:foundlobby.name, nameofroom:foundlobby.name}) : res.render('error', {message:'Game not found'})
 })
 
 //not super secure, but easy enough to buff up I think.
-var supersecret = 'thiswillchange'
 app.get('/admin/:adminpass', function(req, res, next){
-  var isAdmin = req.params.adminpass == supersecret
+  var privkey = req.params.adminpass
+  var isAdmin = hashpass(privkey) == '160c6be7d60242b70b1988d173d963bc8aaccba69e4a76e877e640bab86007fa'
+
   isAdmin ? res.render('admin', {lobbylist:lobbylist}) : res.redirect('/')
 })
 

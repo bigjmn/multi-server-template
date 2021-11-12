@@ -1,55 +1,229 @@
+<link rel='stylesheet' href='/stylesheets/style.css' />
+
 <body>
   <script src = "/socket.io/socket.io.js"></script>
 
+  <div id="lobby-holder" class="lingrad">
 
 
 
 
 
-  <h1>you made it</h1>
 
-  <div id="lobby-holder">
-    <div class="panel" id='leftpanel'>
-      <div id="nameholder">
+      <div id="slideshowholder">
+        <button id='backbutton' type="button" name="button" onclick="exit()">X</button>
+
+        <div class="buttonholder">
+
+          <button type="button" name="button" id='prevbut' class='changebut' onclick='prevslide()'>&#8249</button>
+
+
+        </div>
+
+
+      <div id="mainshow">
+        <div class="slidepage" id="slide0">
+          <h1>Tetris Buddies</h1>
+          <h2>An asymmetric co-op tetris game. Not currently spelled with a Z.</h2>
+
+        </div>
+
+        <div class="slidepage" id="slide1">
+          <h1>The Tetris Part</h1>
+          <p>You know tetris. The blocks fall, and you maneuver them to
+          form complete rows, which then get removed. If the blocks reach the top, you lose.
+        If you DON'T know tetris, this isn't the right game to start with. Here are the controls... </p>
+        <div>
+          <p><span style="font-weight:bold">ARROW LEFT</span><span style="float:right">move left</span></p>
+          <p><span style="font-weight:bold">ARROW RIGHT</span><span style="float:right">move right</span></p>
+          <p><span style="font-weight:bold">ARROW UP</span><span style="float:right">rotate</span></p>
+          <p><span style="font-weight:bold">ENTER</span><span style="float:right">auto-drop</span></p>
+
+        </div>
+
+        </div>
+
+        <div class="slidepage" id="slide2">
+          <h1>The Buddies Part</h1>
+          <p>With every new piece, the controls are divided up amongst members of team. One
+          team member may only be able to move the piece to the left, another to the right, etc. You have to work together with your team to
+      maneuver the piece the way you want. The exception is auto-drop, which every player can always do.</p>
+      <p>For a given piece, you may have no controls (besides auto-drop). You may have all the controls. Players can overlap with what controls they have</p>
+      <p>The only guaruntee is that every control will available to at least one person.</p>
+      <br>
+      <p>If a player tries to use a control they don't have, the piece auto-drops.</p>
+
+        </div>
+        <div class="slidepage" id="slide3">
+          <h1>Game Modes</h1>
+          <p>There are three modes to choose from.</p>
+          <br>
+          <p><span style="font-weight:bold">Classic Mode</span><span style="float:right">Players can see everyone's controls.</span></p>
+          <p><span style="font-weight:bold">Self View</span><span style="float:right">Players can each see only their own controls.</span></p>
+          <p><span style="font-weight:bold">Buddy View</span><span style="float:right">Players can each see only everyone <i>else's</i> controls</span></p>
+          <br>
+          <p>As you can imagine, it's essential for your team to communicate information quickly and efficiently.
+          </p>
+
+          <h2>Good Luck!</h2>
+
+
+
+
+          </div>
+
 
       </div>
-      <div id="usernamepicker">
+      <div class="buttonholder">
+        <button type="button" name="button" id='nextbut' class='changebut' onclick='nextslide()'>&#8250</button>
+
+
+      </div>
+      </div>
+
+
+    <div class="sidepanel" id='leftpanel'>
+      <div id="listheader"class="bubbleborder">{{nameofroom}}
+
+      </div>
+      <div id="nameholder" class="bubbleborder">
+
+      </div>
+
+      <div id="usernamepicker" class="bubbleborder">
         <input type="text" id="newusername" value="">
         <button type="button" id="changeusername">Change Username</button>
       </div>
 
+    </div>
+    <div id="centerpanel" class="lingrad">
+
+      <div id="gameoversign" class='centerlayer'>
+        <h1>GAME OVER</h1>
+      </div>
+      <div id="options-area" class=''>
+
+        <div class="centerbutton">
+          <h1 id='tetristitle'>TETRIS PALS</h1>
+
+        </div>
+        <div id='waitmessage'><p>Waiting for the host to start the game</p></div>
+        <div id="game-modes" class="">
+          <h2>GAME MODE</h2>
+  <div class="tab">
+
+    <button class="tablinks " id='allView'>CLASSIC MODE</button>
+    <button class="tablinks " id='selfView'>SELF VIEW</button>
+    <button class="tablinks " id='friendView'>BUDDY VIEW</button>
+  </div>
+
+  <div id="allViewcontent" class="tabcontent bubbleborder">
+
+    <p>Players can see everyone's controls. Don't pick this one.</p>
+  </div>
+
+  <div id="selfViewcontent" class="tabcontent bubbleborder">
+
+    <p>Players can only see their own controls.</p>
+  </div>
+
+  <div id="friendViewcontent" class="tabcontent bubbleborder">
+
+    <p>Players can only see each other's controls.</p>
+  </div>
+
+
+</div>
+
+<div id="rulesbox" class=''>
+  <button type="button" id="rulebutton" class="bubbleborder">Rules</button>
+
+</div>
+
+
+      </div>
+
+      <div id="start-area" class='centerlayer'>
+
+      <canvas id="canvas" class="bubbleborder" width="300" height="540" ></canvas>
+
+
+
 
     </div>
-    <div id="center-panel" class='panel'>
-      <div id="start-area">
-        <canvas id="canvas" width="300" height="540" ></canvas>
 
+
+
+
+    </div>
+
+    <div class="sidepanel bubbleborder">
+      <div id="previewcanvasholder">
+        <canvas id="previewcan" width="150" height="120"></canvas>
+
+      </div>
+      <div class="statblock">
+        <div class="squeezestat">LEVEL
+
+        </div>
+        <div id="level" class='stat'>0
+
+        </div>
+
+      </div>
+
+      <div class="statblock">
+        <div class="squeezestat">LINES CLEARED
+
+        </div>
+        <div id="linescleared" class='stat'>0
+
+        </div>
+
+      </div>
+
+      <div class="statblock">
+        <div id="squeezestat">PENALTIES
+
+        </div>
+        <div id="penalties" class='stat'>0
+
+        </div>
+
+      </div>
+      <div id="soundholder" class='statblock'>
+        <div class="squeezestat">SFX
+
+        </div>
+        <button id="sfxbut" type="button"><i style='font-size:30px' class='fas'>&#xf028;</i>
+
+
+        </button>
+        <button type="button" name="button" id='playbutton' class='soundbutton'>try</button>
+        <button type="button" name="button" id='setbutton' class='soundbutton'>try</button>
+        <button type="button" name="button" id='penaltybutton' class='soundbutton'>try</button>
 
 
 
       </div>
-    </div>
-    <div class="panel" id='rightpanel'>
-      <div id="waitmessage">
-        Waiting for the host to start the game...
-      </div>
-
-
-      <!-- Game stuff here -->
-
-
-
-      <!-- This could also be on the index page  -->
-      <div id="rulesbox">
-        <button type="button" id="rulebutton">Rules</button>
-
-      </div>
 
     </div>
+
+
+
+
+
+
 
 
   </div>
   <script src='/javascripts/gamescript.js' type="module"></script>
 
+  </script>
 
 </body>
+
+
+
+
+<!-- saved -->

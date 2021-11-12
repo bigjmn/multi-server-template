@@ -1,100 +1,121 @@
+<link rel="stylesheet" href="stylesheets/waitstyles.css">
+</head>
 <body>
-  <script src = "/socket.io/socket.io.js"></script>
-  <script src= "/javascripts/waitroom.js">
-
-  </script>
-
-  <h1>{{ title }}</h1>
-  <div id="roomgetter">
-    <button type="button" name="button" id='createbutton' onclick="$('#creatorform').show(); $('#joinerlist').hide()">Create</button>
-    <button type="button" name="button" id='joinbutton' onclick="$('#creatorform').hide(); $('#joinerlist').show()">Join</button>
-
-
-  </div>
-  <div id="joinerlist">
-    <h2>Join a Room</h2>
+<script src = "/socket.io/socket.io.js"></script>
 
 
 
-    <div id=buttonlist>
-      {{#each rooms}}
-      <button type="button" class="collapsible">{{this}}</button>
-        <div class="content">
-          <form class="" action="/join/{{this}}" method="post">
+<main class="lingrad">
+  <div id="slideshowholder">
+    <button id='backbutton' type="button" name="button" onclick="exit()">X</button>
 
-            <label for="guesspassword">Password</label>
-            <input type="text" name="guesspassword" value="">
-            <div>
-              <button type="submit" name="joinattempt" value={{this}}>Join Room</button>
-            </div>
+    <div class="buttonholder">
 
-          </form>
-        </div>
-      {{/each}}
+      <button type="button" name="button" id='prevbut' class='changebut' onclick='prevslide()'>&#8249</button>
+
+
     </div>
 
+
+  <div id="mainshow">
+    <div class="slidepage" id="slide0">
+      <h1>Tetris Buddies</h1>
+      <h2>An asymmetric co-op tetris game. Not currently spelled with a Z.</h2>
+
+    </div>
+
+    <div class="slidepage" id="slide1">
+      <h1>The Tetris Part</h1>
+      <p>You know tetris. The blocks fall, and you maneuver them to
+      form complete rows, which then get removed. If the blocks reach the top, you lose.
+    If you DON'T know tetris, this isn't the right game to start with. Here are the controls... </p>
+    <div>
+      <p><span style="font-weight:bold">ARROW LEFT</span><span style="float:right">move left</span></p>
+      <p><span style="font-weight:bold">ARROW RIGHT</span><span style="float:right">move right</span></p>
+      <p><span style="font-weight:bold">ARROW UP</span><span style="float:right">rotate</span></p>
+      <p><span style="font-weight:bold">ENTER</span><span style="float:right">auto-drop</span></p>
+
+    </div>
+
+    </div>
+
+    <div class="slidepage" id="slide2">
+      <h1>The Buddies Part</h1>
+      <p>With every new piece, the controls are divided up amongst members of team. One
+      team member may only be able to move the piece to the left, another to the right, etc. You have to work together with your team to
+  maneuver the piece the way you want. The exception is auto-drop, which every player can always do.</p>
+  <p>For a given piece, you may have no controls (besides auto-drop). You may have all the controls. Players can overlap with what controls they have</p>
+  <p>The only guaruntee is that every control will available to at least one person.</p>
+  <br>
+  <p>If a player tries to use a control they don't have, the piece auto-drops.</p>
+
+    </div>
+    <div class="slidepage" id="slide3">
+      <h1>Game Modes</h1>
+      <p>There are three modes to choose from.</p>
+      <br>
+      <p><span style="font-weight:bold">Classic Mode</span><span style="float:right">Players can see everyone's controls.</span></p>
+      <p><span style="font-weight:bold">Self View</span><span style="float:right">Players can each see only their own controls.</span></p>
+      <p><span style="font-weight:bold">Buddy View</span><span style="float:right">Players can each see only everyone <i>else's</i> controls</span></p>
+      <br>
+      <p>As you can imagine, it's essential for your team to communicate information quickly and efficiently.
+      </p>
+
+      <h2>Good Luck!</h2>
+
+
+
+
+      </div>
+
+
+  </div>
+  <div class="buttonholder">
+    <button type="button" name="button" id='nextbut' class='changebut' onclick='nextslide()'>&#8250</button>
+
+
+  </div>
   </div>
 
 
+  <div id="centerpanel" class="bubbleborder ">
 
 
 
 
-  <form action="/create" method="post" id='creatorform'>
-  <div>
-      <label>Room Name:</label>
-      <input type="text" name="roomname" />
-      <br/>
-  </div>
+<div id="headwrapper" class='tetristitle'>
+  <h1 >Tetris Buddies</h1>
+  <h2>A Co-op Tetris Game of Asymmetrical Information</h2>
+  <h4>Not currently spelled with a Z</h4>
 
-  <div>
-    <label for="privacy">Room Privacy:</label>
+</div>
 
-    <select name="privacy" id="privacy">
-      <option value="public" id='pickpub'>Public</option>
-      <option value="private" id='pickpriv'>Private</option>
-      <option value="hidden" id='pickhid'>Hidden</option>
+<div id="formwrapper">
+  <form class="" action="/create" method="post" id='creatorform'>
+    <div class="inputwrapper" >
+      <input type="text" name="roomname" value="" id='roomname' placeholder="Room Name" class="centerbutton" autocomplete="off">
 
-    </select>
-  </div>
+    </div>
 
+    <div class="inputwrapper">
+      <input type="submit" name="" value="Create Room" class="centerbutton" >
 
 
-  <div id='passzone' data-show-if="privacy:private">
-      <label>Room Password:</label>
-      <input type="text" name="password" />
-      <br/>
-  </div>
-
-  <div>
-      <input type="submit" value="Submit" />
-  </div>
-</form>
-<script type="text/javascript">
-var socket = io()
-$('#privacy').on('change', function(){
-  $('#passzone').hide()
-  if (this.value == 'private'){
-    $('#passzone').show()
-  }
-})
+    </div>
 
 
-var coll = document.getElementsByClassName("collapsible");
-var i;
+  </form>
 
-for (i = 0; i < coll.length; i++) {
-  coll[i].addEventListener("click", function() {
-    this.classList.toggle("active");
-    var content = this.nextElementSibling;
-    if (content.style.display === "block") {
-      content.style.display = "none";
-    } else {
-      content.style.display = "block";
-    }
-  });
-}
+</div>
+
+<div class="inputwrapper" id='ruleswrapper'>
+  <button type="button" name="button" id='rulebutton' class="centerbutton">Learn the Rules</button>
+
+</div>
+</div>
+</main>
+<script src='javascripts/interface.js'>
+
 </script>
-
 
 </body>
