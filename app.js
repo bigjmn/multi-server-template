@@ -19,9 +19,7 @@ function hashpass(secret){
   return hash
 
 }
-console.log(hashpass('jnicks'))
 
-'160c6be7d60242b70b1988d173d963bc8aaccba69e4a76e877e640bab86007fa'
 
 var app = express();
 
@@ -120,7 +118,7 @@ app.get('/game/:roomid', function(req, res, next){
 //not super secure, but easy enough to buff up I think.
 app.get('/admin/:adminpass', function(req, res, next){
   var privkey = req.params.adminpass
-  var isAdmin = hashpass(privkey) == '160c6be7d60242b70b1988d173d963bc8aaccba69e4a76e877e640bab86007fa'
+  var isAdmin = hashpass(privkey) == '5341cedefad6eec44ea8a676e5abaac12536061335638bd2fcd3efaeaafd5c6c'
 
   isAdmin ? res.render('admin', {lobbylist:lobbylist}) : res.redirect('/')
 })
